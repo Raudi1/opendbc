@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from opendbc.car import get_safety_config, structs
 from opendbc.car.interfaces import CarInterfaceBase
+from opendbc.car.rivian.values import RivianSafetyFlags
 
 
 class CarInterface(CarInterfaceBase):
@@ -12,7 +13,7 @@ class CarInterface(CarInterfaceBase):
     ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.rivian)]
 
     # pending validation
-    ret.dashcamOnly = True
+    ret.dashcamOnly = False
 
     ret.steerActuatorDelay = 0.25
     ret.steerLimitTimer = 0.4
@@ -21,13 +22,13 @@ class CarInterface(CarInterfaceBase):
     ret.steerControlType = structs.CarParams.SteerControlType.torque
     ret.radarUnavailable = True
 
-    ret.experimentalLongitudinalAvailable = False
+    ret.experimentalLongitudinalAvailable = True
     if experimental_long:
       ret.openpilotLongitudinalControl = True
-      #ret.safetyConfigs[0].safetyParam |= Panda.FLAG_RIVIAN_LONG_CONTROL
+      ret.safetyConfigs[0].safetyParam |= RivianSafetyFlags.FLAG_RIVIAN_LONG_CONTROL.value
 
     ret.longitudinalActuatorDelay = 0.35
     ret.vEgoStopping = 0.25
-    ret.stopAccel = 0
+    ret.stopAccel = -0.5
 
     return ret

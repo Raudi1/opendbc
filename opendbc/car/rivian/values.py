@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import StrEnum, IntFlag
 
 from opendbc.car.structs import CarParams
 from opendbc.car import Bus, structs
@@ -52,5 +52,8 @@ class CarControllerParams:
 
   ACCEL_MIN = -3.48  # m/s^2
   ACCEL_MAX = 2.0  # m/s^2
+
+class RivianSafetyFlags(IntFlag):
+  FLAG_RIVIAN_LONG_CONTROL = 1
 
 DBC = CAR.create_dbc_map()

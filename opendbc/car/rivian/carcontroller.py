@@ -29,8 +29,7 @@ class CarController(CarControllerBase):
 
     # Longitudinal control
     if self.CP.openpilotLongitudinalControl:
-      stopping = actuators.longControlState == LongCtrlState.stopping
-      can_sends.append(create_longitudinal(self.packer, self.frame % 15, actuators.accel, CC.enabled, stopping))
+      can_sends.append(create_longitudinal(self.packer, self.frame % 15, actuators.accel, CC.enabled))
 
     new_actuators = actuators.as_builder()
     new_actuators.steer = apply_steer / CarControllerParams.STEER_MAX
