@@ -275,6 +275,7 @@ extern const safety_hooks hyundai_hooks;
 extern const safety_hooks hyundai_legacy_hooks;
 extern const safety_hooks mazda_hooks;
 extern const safety_hooks nissan_hooks;
+extern const safety_hooks rivian_hooks;
 extern const safety_hooks subaru_hooks;
 extern const safety_hooks subaru_preglobal_hooks;
 extern const safety_hooks tesla_hooks;
