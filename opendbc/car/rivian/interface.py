@@ -22,7 +22,7 @@ class CarInterface(CarInterfaceBase):
     ret.experimentalLongitudinalAvailable = True
     if experimental_long:
       ret.openpilotLongitudinalControl = True
-      ret.safetyConfigs[0].safetyParam |= RivianSafetyFlags.FLAG_RIVIAN_LONG_CONTROL.value
+      ret.safetyConfigs[0].safetyParam |= RivianSafetyFlags.LONG_CONTROL.value
 
     ret.longitudinalActuatorDelay = 0.35
     ret.vEgoStopping = 0.25
