@@ -11,9 +11,6 @@ class CarInterface(CarInterfaceBase):
 
     ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.rivian)]
 
-    # pending validation
-    ret.dashcamOnly = False
-
     ret.steerActuatorDelay = 0.25
     ret.steerLimitTimer = 0.4
     CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
@@ -21,6 +18,7 @@ class CarInterface(CarInterfaceBase):
     ret.steerControlType = structs.CarParams.SteerControlType.torque
     ret.radarUnavailable = True
 
+    # TODO: pending finding/handling missing set speed and fixing up radar parser
     ret.experimentalLongitudinalAvailable = True
     if experimental_long:
       ret.openpilotLongitudinalControl = True
@@ -28,6 +26,6 @@ class CarInterface(CarInterfaceBase):
 
     ret.longitudinalActuatorDelay = 0.35
     ret.vEgoStopping = 0.25
-    ret.stopAccel = -0.5
+    ret.stopAccel = 0
 
     return ret
