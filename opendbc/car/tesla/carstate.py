@@ -56,7 +56,10 @@ class CarState(CarStateBase):
 
     ret.cruiseState.enabled = cruise_state in ("ENABLED", "STANDSTILL", "OVERRIDE", "PRE_FAULT", "PRE_CANCEL")
     if speed_units == "KPH":
-      ret.cruiseState.speed = cp_party.vl["DI_state"]["DI_digitalSpeed"] * CV.KPH_TO_MS
+      if cp_party.vl["DI_state"]["DI_digitalSpeed"] <150:
+        ret.cruiseState.speed = cp_party.vl["DI_state"]["DI_digitalSpeed"] * CV.KPH_TO_MS
+      else:
+        ret.cruiseState.speed = 180 * CV.KPH_TO_MS
     elif speed_units == "MPH":
       ret.cruiseState.speed = cp_party.vl["DI_state"]["DI_digitalSpeed"] * CV.MPH_TO_MS
     ret.cruiseState.available = cruise_state == "STANDBY" or ret.cruiseState.enabled
