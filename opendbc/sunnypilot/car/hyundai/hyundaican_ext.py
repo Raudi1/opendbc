@@ -29,7 +29,7 @@ class HyundaiCanEXT:
   LEAD_VISIBLE_HYSTERESIS_ON_FRAMES: int = 50
   LEAD_VISIBLE_HYSTERESIS_OFF_FRAMES: int = 50
   OBJECT_GAP_HYSTERESIS_FRAMES: int = 50
-  LANE_POSITION_HYSTERESIS_FRAMES: int = 10
+  LANE_POSITION_HYSTERESIS_FRAMES: int = 5
 
   def __init__(self):
     self.hyundaican_ext = HyundaiCanEXTParams()
@@ -127,66 +127,48 @@ class HyundaiCanEXT:
     stopping_distance = HyundaiCanEXT._calculate_stopping_distance(CS.out.vEgo, CC.hudControl.leadDistanceBars)
     self.hyundaicanfd_ext.objectRelGap = objectRelGap
     self.hyundaicanfd_ext.targetDistance = stopping_distance if lead_distance == 0 else min (stopping_distance, lead_distance)
-    self.hyundaicanfd_ext.lanelineLeft, self.hyundaicanfd_ext.lanelineRight = self._calculate_lane_positions(CC_SP, CS)
+    self.hyundaicanfd_ext.lanelineLeft, self.hyundaicanfd_ext.lanelineRight = self._calculate_lane_positions(CS)
 
     return self.hyundaicanfd_ext
 
-  def _calculate_1b5_lane_positions(self, CS: structs.CarState) -> tuple[float, float]:
-    leftlaneraw, rightlaneraw = CS.leftLanePosition, CS.rightLanePosition
-    leftlanequal, rightlanequal = CS.leftLaneQuality, CS.rightLaneQuality
-
-    scale_per_m = 15 / 1.7
-    leftlane = abs(int(round(15 + (leftlaneraw - 1.7) * scale_per_m)))
-    rightlane = abs(int(round(15 + (rightlaneraw - 1.7) * scale_per_m)))
-
-    if leftlanequal not in (2, 3):
-      leftlane = 0
-    if rightlanequal not in (2, 3):
-      rightlane = 0
-
-    if leftlaneraw == -2.0248375:
-      leftlane = 30 - rightlane
-    if rightlaneraw == 2.0248375:
-      rightlane = 30 - leftlane
-
-    if leftlaneraw == rightlaneraw == 0:
-      leftlane = rightlane = 15
-    elif leftlaneraw == 0:
-      leftlane = 30 - rightlane
-    elif rightlaneraw == 0:
-      rightlane = 30 - leftlane
-
-    total = leftlane + rightlane
-    if total == 0:
-      leftlane = rightlane = 15
-    else:
-      leftlane = round((leftlane / total) * 30)
-      rightlane = 30 - leftlane
-
-    return leftlane, rightlane
-
-  def _calculate_lane_positions(self, CC_SP: structs.CarControlSP, CS: structs.CarState) -> tuple[float, float]:
-
+  def _calculate_lane_positions(self, CS: structs.CarState) -> tuple[float, float]:
     # Apply hysteresis
     self.lane_frame_counter += 1
     if self.lane_frame_counter >= self.LANE_POSITION_HYSTERESIS_FRAMES:
 
-      model_lane_width = abs(CC_SP.lanelineRightY) + abs(CC_SP.lanelineLeftY)
-      raw_left_lane, raw_right_lane = self._calculate_1b5_lane_positions(CS)
+      leftlaneraw, rightlaneraw = CS.leftLanePosition, CS.rightLanePosition
+      leftlanequal, rightlanequal = CS.leftLaneQuality, CS.rightLaneQuality
 
-      if model_lane_width > 0:
-        scaling_factor = 30.0 / model_lane_width
-        dist_from_left_line = abs(CC_SP.lanelineLeftY)
-        dist_from_right_line = abs(CC_SP.lanelineRightY)
+      scale_per_m = 15 / 1.7
+      leftlane = abs(int(round(15 + (leftlaneraw - 1.7) * scale_per_m)))
+      rightlane = abs(int(round(15 + (rightlaneraw - 1.7) * scale_per_m)))
 
-        raw_model_left_lane = dist_from_left_line * scaling_factor
-        raw_model_right_lane = dist_from_right_line * scaling_factor
+      if leftlanequal not in (2, 3):
+        leftlane = 0
+      if rightlanequal not in (2, 3):
+        rightlane = 0
 
-        raw_left_lane = raw_model_left_lane if raw_left_lane == 15 else (raw_left_lane + raw_model_left_lane) / 2
-        raw_right_lane = raw_model_right_lane if raw_right_lane == 15 else (30 - raw_left_lane)
+      if leftlaneraw == -2.0248375:
+        leftlane = 30 - rightlane
+      if rightlaneraw == 2.0248375:
+        rightlane = 30 - leftlane
 
-      self.left_laneline = raw_left_lane
-      self.right_laneline = raw_right_lane
+      if leftlaneraw == rightlaneraw == 0:
+        leftlane = rightlane = 15
+      elif leftlaneraw == 0:
+        leftlane = 30 - rightlane
+      elif rightlaneraw == 0:
+        rightlane = 30 - leftlane
+
+      total = leftlane + rightlane
+      if total == 0:
+        leftlane = rightlane = 15
+      else:
+        leftlane = round((leftlane / total) * 30)
+        rightlane = 30 - leftlane
+
+      self.left_laneline = leftlane
+      self.right_laneline = rightlane
       self.lane_frame_counter = 0
 
     return self.left_laneline, self.right_laneline
