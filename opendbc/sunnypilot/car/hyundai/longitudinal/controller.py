@@ -223,7 +223,7 @@ class LongitudinalController:
     if self.long_tuning_param == LongitudinalTuningType.PREDICTIVE:
       self.jerk_lower = desired_jerk_lower
     elif self.long_tuning_param == LongitudinalTuningType.DYNAMIC:
-      self.jerk_lower = ramp_update(self.jerk_lower, dynamic_desired_lower_jerk)
+      self.jerk_lower = dynamic_desired_lower_jerk
 
     # Disable jerk when longitudinal control is inactive
     if not CC.longActive:
@@ -291,7 +291,7 @@ class LongitudinalController:
     """Handle FCW situations with emergency braking jerk allowed."""
     self.comfort_band_upper = 0.0
     self.comfort_band_lower = 0.0
-    accel = float(np.clip(self.accel_cmd, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX))
+    accel = float(max(max(self.accel_cmd, -2.0), CarControllerParams.ACCEL_MIN))
     self.desired_accel = accel
     self.actual_accel = accel
     self.accel_last = self.actual_accel
